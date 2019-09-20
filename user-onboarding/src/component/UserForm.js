@@ -30,6 +30,18 @@ const UserForm = ({values, errors, touched, status}) => {
                 {touched.email && errors.email && (<p className="error">{errors.email}</p>)}
 
                 <Field
+                component="select"
+                className="role-select"
+                name="role">
+                <option>Please Choose a Role</option>    
+                <option value="front-end">Front-end Developer</option>  
+                <option value="back-end">Back-end Developer</option>    
+                <option value="full-stack">Full Stack Developer</option>    
+                <option value="ui-ux">UI/UX Developer</option>      
+                </Field>
+                {touched.role && errors.role && (<p className="error">{errors.role}</p>)}
+
+                <Field
                 name="password"
                 type={values.showPassword ? 'text' : 'password'}
                 placeholder="Password"
@@ -37,11 +49,13 @@ const UserForm = ({values, errors, touched, status}) => {
                 {touched.password && errors.password && (<p className="error">{errors.password}</p>)}
 
                 <label className="checkbox-container">
+                    Terms of Service
                     <Field
                     type="checkbox"
                     name="TOS"
                     checked={values.TOS}
-                  />        
+                  />  
+                  <span className="checkmark"></span>      
                 </label>
 
                 <button>Submit</button>  
@@ -60,24 +74,27 @@ const UserForm = ({values, errors, touched, status}) => {
 };
 
 const FormikUserForm = withFormik({
-    mapPropsToValues({name, email, password, TOS}) {
+    mapPropsToValues({name, email, role, password, TOS}) {
         return {
             name: name || "",
             email: email || "",
+            role: role || "",
             password: password || "",
             TOS: TOS || false
         };
 },
 validationSchema: Yup.object().shape({
-    name: Yup.string().required(),
-    email: Yup.string().required(),
+    name: Yup.string().required("Your name please!"),
+    email: Yup.string().required("Uh uh, we need an email!"),
+    role: Yup.string().required(),
     password: Yup.string().required()
 }),
 
-handleSubmit(values, {setStatus}) {
+handleSubmit(values, {setStatus, resetForm}) {
     axios.post("https://reqres.in/api/users/", values)
     .then(res => {
         setStatus(res.data);
+        resetForm();
     })
     .catch(err => console.log(err.res));
 }
